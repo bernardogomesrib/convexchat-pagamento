@@ -22,6 +22,9 @@ export default defineSchema({
     userId: v.id("users"),
     valor: v.number(),
     dataCompra: v.number(),
-    status: v.optional(v.string())
-  }).index("by_user", ["userId"]),
+    status: v.optional(v.string()),
+    orderId: v.string(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_orderId", ["orderId"]),
 });

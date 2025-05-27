@@ -6,12 +6,12 @@ import { Toaster } from "sonner";
 import Chat from "./Chat";
 import { euToUsuario, User } from "./types";
 import { useEffect, useState } from "react";
-import { initMercadoPago } from "@mercadopago/sdk-react";
+
 
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   useEffect(() => {
-    initMercadoPago("TEST-2ee88f3a-25ea-4a80-86db-a89899c6be44");
+    
   }, []);
 
   return (

@@ -2,57 +2,32 @@
 import { action } from "./_generated/server";
 import crypto from "crypto";
 import { v } from "convex/values";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const crc32 = require("buffer-crc32");
 
-const secret =
-  "961b8dff2253bfab5bd6b2589c74c7de056a3c77544b3186174c86566df91219";
+const WEBHOOK_ID = "1HJ85771JV089142S";
 
-export const validarAssinatura = action({
+export const validarAssinaturaPaypal = action({
   args: {
-    xSignature: v.string(),
-    xRequestId: v.string(),
-    dataID: v.string(),
+    transmissionId: v.string(),
+    timeStamp: v.string(),
+    certUrl: v.string(),
+    transmissionSig: v.string(),
+    rawBody: v.string(),
   },
   handler: async (ctx, args) => {
-    return valida(args.xSignature,args.xRequestId, args.dataID);
+    // Calcula o CRC32 do corpo cru em decimal, igual ao exemplo do PayPal
+    const crc = parseInt("0x" + crc32(args.rawBody).toString("hex"));
+    // Monta a mensagem original
+    const message = `${args.transmissionId}|${args.timeStamp}|${WEBHOOK_ID}|${crc}`;
+    // Baixa o certificado PEM do PayPal
+    const certPem = await fetch(args.certUrl).then((r) => r.text());
+    // Decodifica a assinatura base64
+    const signatureBuffer = Buffer.from(args.transmissionSig, "base64");
+    // Cria o verificador
+    const verifier = crypto.createVerify("SHA256");
+    verifier.update(message);
+    // Verifica a assinatura
+    return verifier.verify(certPem, signatureBuffer);
   },
 });
-
-
-
-function valida(xSignature:string, xRequestId:string, dataID:string) {
-  const parts = xSignature.split(",");
-
-  let ts;
-  let hash;
-
-  parts.forEach((part) => {
-    const [key, value] = part.split("=");
-    if (key && value) {
-      const trimmedKey = key.trim();
-      const trimmedValue = value.trim();
-      if (trimmedKey === "ts") {
-        ts = trimmedValue;
-      } else if (trimmedKey === "v1") {
-        hash = trimmedValue;
-      }
-    }
-  });
-
-  const manifest = `id:${dataID};request-id:${xRequestId};ts:${ts};`;
-
-  const hmac = crypto.createHmac("sha256", secret);
-  hmac.update(manifest);
-
-  const sha = hmac.digest("hex");
-
-  if (sha === hash) {
-    console.log("HMAC verification passed");
-    return true
-  } else {
-    console.log("HMAC verification failed");
-    return false
-  }
-}
-
-
-
