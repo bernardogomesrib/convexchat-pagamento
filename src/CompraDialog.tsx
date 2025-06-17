@@ -53,7 +53,22 @@ const CompraDialog = ({ open, setOpen }: { open: boolean, setOpen: (op: boolean)
             <h2>Compra Créditos</h2>
             <p>Você pode comprar saldo aqui.</p>
             <label>Valor em reais:</label>
-            <input value={valor} style={{width:"100%", padding:"8px"}}type="number" onChange={(e)=>setValor(Number(e.target.value    ))} />
+            <input
+                value={valor === 0 ? "" : valor}
+                style={{ width: "100%", padding: "8px" }}
+                type="number"
+                min={1}
+                step="0.01"
+                onChange={(e) => {
+                    let v = e.target.value;
+                    // Limita para 2 casas decimais
+                    if (v.includes(".")) {
+                        const [int, dec] = v.split(".");
+                        v = int + "." + dec.slice(0, 2);
+                    }
+                    setValor(v === "" ? 0 : Number(v));
+                }}
+            />
             <PayPalButtons
             createOrder={async (_data, actions) => {
                 // Cria a ordem no PayPal para R$10,00
