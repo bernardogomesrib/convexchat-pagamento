@@ -27,7 +27,7 @@ const UsuariosBox = ({ usuarios, isSidebarOpen, eu }: { usuarios: Usuario[] | un
 
     return (
         <div className={`usuarios ${isSidebarOpen ? 'active' : ''}`}>
-            {eu && <div>Meu saldo: {eu.saldo}</div>}
+            {eu && <div>Saldo de mensagens: {eu.saldo?eu.saldo:0}</div>}
             <button className="px-4 py-2 rounded-lg transition-colors bg-blue-500 text-white"
                 onClick={() => { void handleComprarSaldo(); }}>Comprar saldo</button>
             <div className="usuarios-header">
