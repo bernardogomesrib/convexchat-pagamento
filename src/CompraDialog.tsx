@@ -1,5 +1,5 @@
 import { PayPalButtons } from "@paypal/react-paypal-js";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../convex/_generated/api";
 import { useMutation } from "convex/react";
 
@@ -8,7 +8,7 @@ import { useMutation } from "convex/react";
 const CompraDialog = ({ open, setOpen }: { open: boolean, setOpen: (op: boolean) => void }) => {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const criarCompra = useMutation(api.comprar.registrarCompra)
-
+    const [valor, setValor] = useState(10);
 
     useEffect(() => {
         const dialog = dialogRef.current;
@@ -52,6 +52,8 @@ const CompraDialog = ({ open, setOpen }: { open: boolean, setOpen: (op: boolean)
         >
             <h2>Compra Créditos</h2>
             <p>Você pode comprar saldo aqui.</p>
+            <label>Valor em reais:</label>
+            <input value={valor} style={{width:"100%", padding:"8px"}}type="number" onChange={(e)=>setValor(Number(e.target.value    ))} />
             <PayPalButtons
             createOrder={async (_data, actions) => {
                 // Cria a ordem no PayPal para R$10,00
@@ -61,7 +63,7 @@ const CompraDialog = ({ open, setOpen }: { open: boolean, setOpen: (op: boolean)
                                 purchase_units: [
                                     {
                                     amount: {
-                                        value: "10.00",
+                                        value: valor.toFixed(2).toString(),
                                         currency_code: "BRL",
                                     },
                                     description: "Compra de créditos",
@@ -78,7 +80,7 @@ const CompraDialog = ({ open, setOpen }: { open: boolean, setOpen: (op: boolean)
                 // Registra a compra no backend
                 const orderId = data.orderID;
                 if (orderId) {
-                await criarCompra({ valor: 100, orderId });
+                await criarCompra({ valor: valor*100, orderId });
                 setOpen(false);
                 alert("Compra realizada com sucesso!, só esperando confirmação do PayPal.");
                 }
