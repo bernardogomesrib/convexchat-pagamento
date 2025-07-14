@@ -36,3 +36,13 @@ export const euToUsuario = (user:User|null)=>{
         saldo: 0, // Inicialmente, o saldo é 0, pode ser atualizado posteriormente
     };
 }
+
+export type Compra = { 
+  _id: Id<"compras">;
+  _creationTime: number;
+  status?: string | undefined;
+  valor: number;
+  userId: Id<"users">;
+  dataCompra: number;
+  orderId: string;
+}

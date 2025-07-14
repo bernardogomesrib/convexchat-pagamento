@@ -8,6 +8,33 @@ export const getCompras = query({
     return await ctx.db.query("compras").collect();
   },
 });
+export const getMinhasCompras = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Usuário não autenticado");
+    }
+ 
+    const userId = identity.subject.split("|")[0] as Id<"users">;
+
+    // Busca o usuário na tabela 'usuarios'
+    const usuario = await ctx.db
+      .query("usuarios")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (!usuario) {
+      return [];
+    }
+
+    return await ctx.db
+      .query("compras")
+      .withIndex("by_user", (q) => q.eq("userId", usuario.userId))
+      .order("desc")
+      .collect();
+  }
+})
 
 export const registrarCompra = mutation({
   args: {

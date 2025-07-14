@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 function Chat({ eu, isSidebarOpen }: { eu: Usuario | null, isSidebarOpen: boolean }) {
     const usuarios = useQuery(api.usuarios.getUsuarios);
     const mensagens = useQuery(api.chat.getMessages);
+    const compras = useQuery(api.comprar.getMinhasCompras);
     const [euMesmo, setEuMesmo] = useState<Usuario | null>(null);
     useEffect(() => {
         const euzinho = usuarios?.find(u => u.userId === eu?.userId);
@@ -22,7 +23,7 @@ function Chat({ eu, isSidebarOpen }: { eu: Usuario | null, isSidebarOpen: boolea
     }, [usuarios,eu]);
     return eu && (
         <div className="main">
-            <UsuariosBox eu={euMesmo} usuarios={usuarios} isSidebarOpen={isSidebarOpen} />
+            <UsuariosBox eu={euMesmo} usuarios={usuarios} isSidebarOpen={isSidebarOpen} compras={compras} />
             <MessageBox mensagens={mensagens} eu={euMesmo} usuarios={usuarios || []} />
             <CaixaDigitacao />
 

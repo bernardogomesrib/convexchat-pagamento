@@ -3,14 +3,14 @@ import { Usuario } from "./types"
 
 const DisplayUsuario = ({usuario}:{usuario:Usuario}) => {
     const [isOnline,setIsOnline] = useState<boolean>(false);
-    function defineStatus() {
-        const agora = Date.now();
-        const ultimaAtividade = new Date(usuario.ultimaAtividade).getTime();
-        const status = ultimaAtividade > agora - 60 * 1000;
-        //console.log(`usuario digitando: ${usuario.digitando} está online? ${isOnline}`);
-        setIsOnline(status);
-    }
     useEffect(() => {
+        function defineStatus() {
+            const agora = Date.now();
+            const ultimaAtividade = new Date(usuario.ultimaAtividade).getTime();
+            const status = ultimaAtividade > agora - 60 * 1000;
+            //console.log(`usuario digitando: ${usuario.digitando} está online? ${isOnline}`);
+            setIsOnline(status);
+        }
         defineStatus();
         const interval = setInterval(defineStatus, 1000);
         return () => clearInterval(interval);
